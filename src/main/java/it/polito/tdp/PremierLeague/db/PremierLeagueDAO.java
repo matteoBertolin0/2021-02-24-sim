@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import it.polito.tdp.PremierLeague.model.Action;
+import it.polito.tdp.PremierLeague.model.CoppiePlayers;
 import it.polito.tdp.PremierLeague.model.Match;
 import it.polito.tdp.PremierLeague.model.Player;
 import it.polito.tdp.PremierLeague.model.Team;
@@ -25,6 +26,60 @@ public class PremierLeagueDAO {
 
 				Player player = new Player(res.getInt("PlayerID"), res.getString("Name"));
 				result.add(player);
+			}
+			conn.close();
+			return result;
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	public List<Player> listAllPlayersByMatch(Match m){
+		String sql = "SELECT p.PlayerID, p.Name "
+				+ "FROM players AS p, actions AS a "
+				+ "WHERE p.PlayerID = a.PlayerID AND a.MatchID = ?";
+		List<Player> result = new ArrayList<Player>();
+		Connection conn = DBConnect.getConnection();
+
+		try {
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setInt(1, m.getMatchID());
+			ResultSet res = st.executeQuery();
+			while (res.next()) {
+
+				Player player = new Player(res.getInt("p.PlayerID"), res.getString("p.Name"));
+				result.add(player);
+			}
+			conn.close();
+			return result;
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	public List<CoppiePlayers> listAllCoppiePlayersByMatch(Match m){
+		String sql = "SELECT DISTINCT a1.PlayerID, p1.Name, a1.TotalSuccessfulPassesAll, a1.Assists, a1.TimePlayed, a2.PlayerID, p2.Name, a2.TotalSuccessfulPassesAll, a2.Assists, a2.TimePlayed "
+				+ "FROM actions AS a1, actions AS a2, players AS p1, players AS p2 "
+				+ "WHERE a1.MatchID = a2.MatchID AND a1.MatchID = ? AND p1.PlayerID=a1.PlayerID AND p2.PlayerID = a2.PlayerID AND a1.TeamID > a2.TeamID";
+		List<CoppiePlayers> result = new ArrayList<CoppiePlayers>();
+		Connection conn = DBConnect.getConnection();
+
+		try {
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setInt(1, m.getMatchID());
+			ResultSet res = st.executeQuery();
+			while (res.next()) {
+				int a1 = res.getInt("a1.TotalSuccessfulPassesAll");
+				int a2 = res.getInt("a1.Assists");
+				int a3 = res.getInt("a1.TimePlayed");
+				double n1 = (double) (res.getInt("a1.TotalSuccessfulPassesAll")+res.getInt("a1.Assists"))/res.getInt("a1.TimePlayed");
+				double n2 = (double) (res.getInt("a2.TotalSuccessfulPassesAll")+res.getInt("a2.Assists"))/res.getInt("a2.TimePlayed");
+				CoppiePlayers coppiaPlayers = new CoppiePlayers(new Player(res.getInt("a1.PlayerID"), res.getString("p1.Name")),new Player(res.getInt("a2.PlayerID"), res.getString("p2.Name")),n1,n2);
+				result.add(coppiaPlayers);
 			}
 			conn.close();
 			return result;
@@ -111,4 +166,26 @@ public class PremierLeagueDAO {
 		}
 	}
 	
+	public void loadAllTeamPlayer(Team t){
+		String sql = "SELECT distinct p.PlayerID, p.Name "
+				+ "FROM actions AS a, teams AS t, players AS p "
+				+ "WHERE a.TeamID=t.TeamID AND a.PlayerID=p.PlayerID AND a.TeamID=?";
+		Connection conn = DBConnect.getConnection();
+
+		try {
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setInt(1, t.getTeamID());
+			ResultSet res = st.executeQuery();
+			while (res.next()) {
+
+				Player player = new Player(res.getInt("p.PlayerID"), res.getString("p.Name"));
+				t.getRosa().add(player);
+				
+			}
+			conn.close();
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
 }

@@ -10,6 +10,7 @@ import java.util.ResourceBundle;
 
 import it.polito.tdp.PremierLeague.model.Match;
 import it.polito.tdp.PremierLeague.model.Model;
+import it.polito.tdp.PremierLeague.model.Player;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -47,17 +48,36 @@ public class FXMLController {
 
     @FXML
     void doCreaGrafo(ActionEvent event) {
-    	
+    	try{
+    		txtResult.clear();
+    		model.creaGrafo(cmbMatch.getValue());
+    		model.loadPlayer(cmbMatch.getValue());
+    		txtResult.appendText("Grafo Creato;\n#VERTICI: "+model.getGrafo().vertexSet().size()+"\n#ARCHI: "+model.getGrafo().edgeSet().size());
+    	}catch(Exception e) {
+    		txtResult.setText("Selezionare un match!");
+    	}
     }
 
     @FXML
     void doGiocatoreMigliore(ActionEvent event) {    	
-    	
+    	try {
+    		txtResult.clear();
+    		Player p = model.getMigliore();
+    		txtResult.appendText("Giocatore migliore:\n"+p+", delta efficienza: "+p.getEff());
+    	}catch(Exception e) {
+    		txtResult.setText("Creare un grafo!");
+    	}
     }
     
     @FXML
     void doSimula(ActionEvent event) {
-
+    	try {
+    		
+    		txtResult.clear();
+    		txtResult.appendText(model.simula(cmbMatch.getValue(), Integer.parseInt(txtN.getText())));
+    	}catch(Exception e) {
+    		txtResult.setText("Creare un grafo!");
+    	}
     }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
@@ -73,5 +93,7 @@ public class FXMLController {
     
     public void setModel(Model model) {
     	this.model = model;
+    	cmbMatch.getItems().clear();
+    	cmbMatch.getItems().addAll(model.getAllMatches());
     }
 }

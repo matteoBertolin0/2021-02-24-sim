@@ -1,13 +1,19 @@
 package it.polito.tdp.PremierLeague.model;
 
-public class Team {
-	Integer teamID;
-	String name;
+import java.util.ArrayList;
+import java.util.List;
 
+public class Team {
+	private Integer teamID;
+	private String name;
+	private List<Player> rosa;
+	private boolean mvp;
+	
 	public Team(Integer teamID, String name) {
 		super();
 		this.teamID = teamID;
 		this.name = name;
+		rosa = new ArrayList<>();
 	}
 	
 	public Integer getTeamID() {
@@ -22,8 +28,22 @@ public class Team {
 	public void setName(String name) {
 		this.name = name;
 	}
-	
-	
+
+	public List<Player> getRosa() {
+		return rosa;
+	}
+
+	public void setRosa(List<Player> rosa) {
+		this.rosa = rosa;
+	}
+
+	public boolean isMvp() {
+		return mvp;
+	}
+
+	public void setMvp(boolean mvp) {
+		this.mvp = mvp;
+	}
 
 	@Override
 	public String toString() {

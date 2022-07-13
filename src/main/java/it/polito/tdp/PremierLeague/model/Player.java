@@ -3,6 +3,7 @@ package it.polito.tdp.PremierLeague.model;
 public class Player {
 	Integer playerID;
 	String name;
+	double eff;
 	
 	public Player(Integer playerID, String name) {
 		super();
@@ -21,6 +22,15 @@ public class Player {
 	}
 	public void setName(String name) {
 		this.name = name;
+	}
+	
+
+	public double getEff() {
+		return eff;
+	}
+
+	public void setEff(double eff) {
+		this.eff = eff;
 	}
 
 	@Override
